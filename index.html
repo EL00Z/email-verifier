@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Email Verifier</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            max-width: 800px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .tab.active {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .gmail-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .gmail-section.active {
+            display: block;
+        }
+
+        .gmail-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+        }
+
+        .status-indicator.connected {
+            background: #28a745;
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            background: #f8f9fa;
+            transition: all 0.3s;
+        }
+
+        .file-upload:hover .file-upload-label {
+            background: #f0f4ff;
+            border-color: #764ba2;
+        }
+
+        .results {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .results-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .results-header h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .result-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .result-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .result-email {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .result-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-valid {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-invalid {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-catch-all {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        .progress-bar.active {
+            display: block;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .email-selector {
+            margin-top: 10px;
+        }
+
+        .email-checkbox {
+            margin-right: 10px;
+        }
+
+        .bulk-actions {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .bulk-actions.active {
+            display: block;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Professional Email Verifier</h1>
+            <p>Verify emails with 99% accuracy using advanced SMTP verification</p>
+        </div>
+
+        <div class="content">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('single')">Single Verification</button>
+                <button class="tab" onclick="switchTab('bulk')">Bulk Upload</button>
+            </div>
+
+            <div class="error-message" id="error-message"></div>
+
+            <!-- Single Verification Tab -->
+            <div id="single-tab" class="tab-content active">
+                <form id="single-form">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" placeholder="John" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" placeholder="Doe" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="domain">Company Domain</label>
+                        <input type="text" id="domain" placeholder="example.com" required>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="enableGmail" onchange="toggleGmailSection()">
+                        <label for="enableGmail">Enable Gmail sending for catch-all emails</label>
+                    </div>
+
+                    <div class="gmail-section" id="gmail-section">
+                        <div class="gmail-status">
+                            <span class="status-indicator" id="gmail-indicator"></span>
+                            <span id="gmail-status-text">Not connected</span>
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="connectGmail()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <polyline points="22,6 12,13 2,6"/>
+                            </svg>
+                            Connect Gmail Account
+                        </button>
+                    </div>
+
+                    <button type="submit" class="btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 11l3 3L22 4"/>
+                            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                        </svg>
+                        Verify Email
+                    </button>
+                </form>
+            </div>
+
+            <!-- Bulk Upload Tab -->
+            <div id="bulk-tab" class="tab-content">
+                <div class="file-upload">
+                    <input type="file" id="csvFile" accept=".csv" onchange="handleFileUpload(event)">
+                    <label for="csvFile" class="file-upload-label">
+                        <div>
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#667eea" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <p style="margin-top: 10px; color: #666;">Drop CSV file here or click to upload</p>
+                            <p style="font-size: 14px; color: #999;">Format: firstName, lastName, domain</p>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="checkbox-group" style="margin-top: 20px;">
+                    <input type="checkbox" id="bulkEnableGmail" onchange="toggleBulkGmailSection()">
+                    <label for="bulkEnableGmail">Enable Gmail sending for catch-all emails</label>
+                </div>
+
+                <div class="progress-bar" id="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <p id="progress-text" style="text-align: center; color: #666; display: none;"></p>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 20px; color: #666;">Verifying emails...</p>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results" id="results">
+                <div class="results-header">
+                    <h3>Verification Results</h3>
+                    <div class="stats" id="stats">
+                        <div class="stat-card">
+                            <div class="stat-number" id="total-count">0</div>
+                            <div class="stat-label">Total Emails</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="valid-count">0</div>
+                            <div class="stat-label">Valid</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="catch-all-count">0</div>
+                            <div class="stat-label">Catch-all</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="results-list"></div>
+
+                <div class="bulk-actions" id="bulk-actions">
+                    <h4 style="margin-bottom: 15px;">Send Test Emails to Selected Catch-all Addresses</h4>
+                    <button class="btn" onclick="sendToSelected()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"/>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                        Send Test Emails
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadResults()" style="margin-left: 10px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Download Results
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - Update this with your Vercel backend URL
+        const API_URL = 'https://email-verifier-backend-o2rhe1jcs-monks-projects-15e11443.vercel.app/api';
+        
+        let verificationResults = [];
+        let gmailConnected = false;
+        let gmailToken = null;
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            
+            if (tab === 'single') {
+                document.querySelector('.tab:first-child').classList.add('active');
+                document.getElementById('single-tab').classList.add('active');
+            } else {
+                document.querySelector('.tab:last-child').classList.add('active');
+                document.getElementById('bulk-tab').classList.add('active');
+            }
+            
+            hideError();
+            hideResults();
+        }
+
+        // Gmail section toggle
+        function toggleGmailSection() {
+            const section = document.getElementById('gmail-section');
+            const checkbox = document.getElementById('enableGmail');
+            section.classList.toggle('active', checkbox.checked);
+        }
+
+        function toggleBulkGmailSection() {
+            const checkbox = document.getElementById('bulkEnableGmail');
+            if (checkbox.checked && !gmailConnected) {
+                connectGmail();
+            }
+        }
+
+        // Gmail OAuth connection
+        async function connectGmail() {
+            try {
+                showLoading();
+                const response = await fetch(`${API_URL}/auth/gmail`);
+                const data = await response.json();
+                
+                if (data.authUrl) {
+                    // Open OAuth window
+                    const authWindow = window.open(data.authUrl, 'Gmail Auth', 'width=500,height=600');
+                    
+                    // Listen for auth completion
+                    window.addEventListener('message', (event) => {
+                        if (event.data.type === 'gmail-auth-success') {
+                            gmailToken = event.data.token;
+                            gmailConnected = true;
+                            updateGmailStatus(true);
+                            authWindow.close();
+                        }
+                    });
+                }
+            } catch (error) {
+                showError('Failed to connect Gmail. Please try again.');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function updateGmailStatus(connected) {
+            const indicator = document.getElementById('gmail-indicator');
+            const statusText = document.getElementById('gmail-status-text');
+            
+            if (connected) {
+                indicator.classList.add('connected');
+                statusText.textContent = 'Connected';
+            } else {
+                indicator.classList.remove('connected');
+                statusText.textContent = 'Not connected';
+            }
+        }
+
+        // Single form submission
+        document.getElementById('single-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const domain = document.getElementById('domain').value;
+            const useGmail = document.getElementById('enableGmail').checked;
+            
+            await verifyEmails([{ firstName, lastName, domain }], useGmail);
+        });
+
+        // File upload handling
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const csv = e.target.result;
+                const lines = csv.split('\n').filter(line => line.trim());
+                const data = [];
+                
+                // Skip header if present
+                const startIndex = lines[0].toLowerCase().includes('first') ? 1 : 0;
+                
+                for (let i = startIndex; i < lines.length; i++) {
+                    const [firstName, lastName, domain] = lines[i].split(',').map(s => s.trim());
+                    if (firstName && lastName && domain) {
+                        data.push({ firstName, lastName, domain });
+                    }
+                }
+                
+                if (data.length === 0) {
+                    showError('No valid data found in CSV file');
+                    return;
+                }
+                
+                const useGmail = document.getElementById('bulkEnableGmail').checked;
+                await verifyEmails(data, useGmail, true);
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // Email verification
+        async function verifyEmails(data, useGmail, isBulk = false) {
+            try {
+                showLoading();
+                hideError();
+                hideResults();
+                verificationResults = [];
+                
+                if (isBulk) {
+                    showProgress(0, data.length);
+                }
+                
+                const batchSize = 10;
+                for (let i = 0; i < data.length; i += batchSize) {
+                    const batch = data.slice(i, i + batchSize);
+                    const response = await fetch(`${API_URL}/verify`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            emails: batch,
+                            gmailToken: useGmail ? gmailToken : null
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Verification failed');
+                    }
+                    
+                    const results = await response.json();
+                    verificationResults.push(...results);
+                    
+                    if (isBulk) {
+                        updateProgress(Math.min(i + batchSize, data.length), data.length);
+                    }
+                }
+                
+                displayResults();
+                
+            } catch (error) {
+                showError(error.message || 'Verification failed. Please try again.');
+            } finally {
+                hideLoading();
+                hideProgress();
+            }
+        }
+
+        // Display results
+        function displayResults() {
+            const resultsDiv = document.getElementById('results');
+            const resultsList = document.getElementById('results-list');
+            
+            // Update statistics
+            const stats = {
+                total: verificationResults.length,
+                valid: verificationResults.filter(r => r.status === 'valid').length,
+                catchAll: verificationResults.filter(r => r.status === 'catch-all').length
+            };
+            
+            document.getElementById('total-count').textContent = stats.total;
+            document.getElementById('valid-count').textContent = stats.valid;
+            document.getElementById('catch-all-count').textContent = stats.catchAll;
+            
+            // Display individual results
+            resultsList.innerHTML = '';
+            verificationResults.forEach((result, index) => {
+                const div = document.createElement('div');
+                div.className = 'result-item';
+                
+                const statusClass = result.status === 'valid' ? 'status-valid' : 
+                                  result.status === 'catch-all' ? 'status-catch-all' : 
+                                  'status-invalid';
+                
+                div.innerHTML = `
+                    <div>
+                        <div class="result-email">${result.email}</div>
+                        <span class="result-status ${statusClass}">${result.status}</span>
+                        ${result.confidence ? `<span style="margin-left: 10px; color: #666;">Confidence: ${result.confidence}%</span>` : ''}
+                    </div>
+                    ${result.status === 'catch-all' && gmailConnected ? `
+                        <div class="email-selector">
+                            <input type="checkbox" class="email-checkbox" data-email="${result.email}" id="check-${index}">
+                            <label for="check-${index}" style="cursor: pointer;">Select for test</label>
+                        </div>
+                    ` : ''}
+                `;
+                
+                resultsList.appendChild(div);
+            });
+            
+            // Show bulk actions if there are catch-all emails and Gmail is connected
+            const hasCatchAll = verificationResults.some(r => r.status === 'catch-all');
+            if (hasCatchAll && gmailConnected) {
+                document.getElementById('bulk-actions').classList.add('active');
+            }
+            
+            resultsDiv.classList.add('active');
+        }
+
+        // Send test emails to selected catch-all addresses
+        async function sendToSelected() {
+            const checkboxes = document.querySelectorAll('.email-checkbox:checked');
+            if (checkboxes.length === 0) {
+                showError('Please select at least one email to send test messages');
+                return;
+            }
+            
+            const emails = Array.from(checkboxes).map(cb => cb.dataset.email);
+            
+            try {
+                showLoading();
+                const response = await fetch(`${API_URL}/send-test`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        emails,
+                        gmailToken
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to send test emails');
+                }
+                
+                const result = await response.json();
+                alert(`Successfully sent test emails to ${result.sent} addresses. Check your Gmail sent folder.`);
+                
+            } catch (error) {
+                showError(error.message || 'Failed to send test emails');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Download results as CSV
+        function downloadResults() {
+            const csv = [
+                'Email,Status,Confidence',
+                ...verificationResults.map(r => 
+                    `${r.email},${r.status},${r.confidence || 'N/A'}`
+                )
+            ].join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `email-verification-results-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // UI Helper functions
+        function showLoading() {
+            document.getElementById('loading').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.remove('active');
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('active');
+        }
+
+        function hideError() {
+            document.getElementById('error-message').classList.remove('active');
+        }
+
+        function hideResults() {
+            document.getElementById('results').classList.remove('active');
+            document.getElementById('bulk-actions').classList.remove('active');
+        }
+
+        function showProgress(current, total) {
+            document.getElementById('progress-bar').classList.add('active');
+            document.getElementById('progress-text').style.display = 'block';
+            updateProgress(current, total);
+        }
+
+        function updateProgress(current, total) {
+            const percentage = (current / total) * 100;
+            document.getElementById('progress-fill').style.width = percentage + '%';
+            document.getElementById('progress-text').textContent = `Processing ${current} of ${total} emails...`;
+        }
+
+        function hideProgress() {
+            document.getElementById('progress-bar').classList.remove('active');
+            document.getElementById('progress-text').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
